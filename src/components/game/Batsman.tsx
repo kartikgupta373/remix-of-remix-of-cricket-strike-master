@@ -11,36 +11,63 @@ export const Batsman = ({ isSwinging, swingProgress }: BatsmanProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const batGroupRef = useRef<THREE.Group>(null);
   const bodyRef = useRef<THREE.Group>(null);
+  const leftArmRef = useRef<THREE.Group>(null);
+  const rightArmRef = useRef<THREE.Group>(null);
   
   useFrame(() => {
     if (!batGroupRef.current || !bodyRef.current) return;
     
     if (isSwinging) {
-      // Dynamic bat swing animation
+      // Dynamic bat swing animation - more pronounced and visible
       const swingPhase = swingProgress;
       
-      // Bat rotation - backswing to follow-through
-      const batRotationZ = -Math.PI / 3 + swingPhase * Math.PI * 1.2;
-      const batRotationY = -0.3 + swingPhase * 0.8;
-      const batRotationX = swingPhase * 0.5;
+      // Bat rotation - dramatic backswing to follow-through
+      const batRotationZ = -Math.PI / 2.5 + swingPhase * Math.PI * 1.5;
+      const batRotationY = -0.4 + swingPhase * 1.2;
+      const batRotationX = swingPhase * 0.8;
       
       batGroupRef.current.rotation.set(batRotationX, batRotationY, batRotationZ);
       
-      // Body rotation during swing
-      bodyRef.current.rotation.y = swingPhase * 0.4;
+      // Move bat forward during swing
+      batGroupRef.current.position.x = -0.35 + swingPhase * 0.3;
+      batGroupRef.current.position.z = 0.15 + swingPhase * 0.4;
       
-      // Slight body lean into shot
-      bodyRef.current.position.x = swingPhase * 0.1;
+      // Body rotation during swing - more pronounced
+      bodyRef.current.rotation.y = swingPhase * 0.6;
+      
+      // Body lean into shot
+      bodyRef.current.position.x = swingPhase * 0.15;
+      bodyRef.current.position.z = swingPhase * 0.1;
+      
+      // Arms follow the bat
+      if (leftArmRef.current) {
+        leftArmRef.current.rotation.x = 0.4 + swingPhase * 0.5;
+        leftArmRef.current.rotation.z = -Math.PI / 5 + swingPhase * 0.4;
+      }
+      if (rightArmRef.current) {
+        rightArmRef.current.rotation.x = 0.3 + swingPhase * 0.6;
+        rightArmRef.current.rotation.z = Math.PI / 5 - swingPhase * 0.3;
+      }
     } else {
-      // Ready stance - bat raised, ready to strike
-      batGroupRef.current.rotation.set(0, -0.2, -Math.PI / 3);
-      bodyRef.current.rotation.y = 0;
+      // Ready stance - bat raised behind, ready to strike
+      batGroupRef.current.rotation.set(0.1, -0.3, -Math.PI / 2.5);
+      batGroupRef.current.position.set(-0.35, 0.9, 0.15);
+      bodyRef.current.rotation.y = -0.1;
       bodyRef.current.position.x = 0;
+      bodyRef.current.position.z = 0;
+      
+      if (leftArmRef.current) {
+        leftArmRef.current.rotation.set(0.4, 0, -Math.PI / 5);
+      }
+      if (rightArmRef.current) {
+        rightArmRef.current.rotation.set(0.3, 0, Math.PI / 5);
+      }
     }
   });
   
   return (
-    <group ref={groupRef} position={[0, 0, 6]} rotation={[0, Math.PI, 0]}>
+    // Batsman positioned on the left side of the bat, facing bowler
+    <group ref={groupRef} position={[0.3, 0, 5.5]} rotation={[0, Math.PI, 0]}>
       <group ref={bodyRef}>
         {/* Torso */}
         <mesh position={[0, 1.0, 0]} castShadow>
@@ -71,86 +98,97 @@ export const Batsman = ({ isSwinging, swingProgress }: BatsmanProps) => {
           </mesh>
         </group>
         
-        {/* Legs with pads */}
-        <mesh position={[-0.12, 0.35, 0]} castShadow>
+        {/* Legs with pads - wider stance */}
+        <mesh position={[-0.15, 0.35, 0]} castShadow>
           <capsuleGeometry args={[0.09, 0.45, 8, 16]} />
           <meshStandardMaterial color="#EEEEEE" /> {/* Batting pads */}
         </mesh>
-        <mesh position={[0.12, 0.35, 0]} castShadow>
+        <mesh position={[0.15, 0.35, 0]} castShadow>
           <capsuleGeometry args={[0.09, 0.45, 8, 16]} />
           <meshStandardMaterial color="#EEEEEE" />
         </mesh>
         
         {/* Shoes */}
-        <mesh position={[-0.12, 0.05, 0.05]} castShadow>
+        <mesh position={[-0.15, 0.05, 0.05]} castShadow>
           <boxGeometry args={[0.1, 0.08, 0.18]} />
           <meshStandardMaterial color="#FFFFFF" />
         </mesh>
-        <mesh position={[0.12, 0.05, 0.05]} castShadow>
+        <mesh position={[0.15, 0.05, 0.05]} castShadow>
           <boxGeometry args={[0.1, 0.08, 0.18]} />
           <meshStandardMaterial color="#FFFFFF" />
         </mesh>
         
-        {/* Left arm (non-batting) */}
-        <group position={[-0.32, 1.1, 0.1]}>
-          <mesh rotation={[0.4, 0, -Math.PI / 5]} castShadow>
+        {/* Left arm (top hand on bat) - connected to bat */}
+        <group ref={leftArmRef} position={[-0.32, 1.1, 0.1]} rotation={[0.4, 0, -Math.PI / 5]}>
+          <mesh castShadow>
             <capsuleGeometry args={[0.055, 0.28, 8, 16]} />
             <meshStandardMaterial color="#1565C0" />
           </mesh>
-          {/* Glove */}
-          <mesh position={[-0.12, -0.15, 0.1]} castShadow>
-            <sphereGeometry args={[0.06, 8, 8]} />
-            <meshStandardMaterial color="#FFFFFF" />
-          </mesh>
-        </group>
-        
-        {/* Right arm (batting arm) - connected to bat */}
-        <group position={[0.32, 1.1, 0.15]}>
-          <mesh rotation={[0.3, 0, Math.PI / 5]} castShadow>
-            <capsuleGeometry args={[0.055, 0.28, 8, 16]} />
+          {/* Forearm */}
+          <mesh position={[-0.08, -0.22, 0.05]} rotation={[0.3, 0, -0.2]} castShadow>
+            <capsuleGeometry args={[0.045, 0.2, 8, 16]} />
             <meshStandardMaterial color="#1565C0" />
           </mesh>
         </group>
         
-        {/* Bat group - positioned at hands */}
-        <group ref={batGroupRef} position={[0.15, 0.85, 0.25]}>
-          {/* Handle grip area (where hands hold) */}
-          <mesh position={[0, 0.32, 0]} castShadow>
-            <cylinderGeometry args={[0.022, 0.022, 0.15, 8]} />
+        {/* Right arm (bottom hand on bat) */}
+        <group ref={rightArmRef} position={[0.32, 1.1, 0.15]} rotation={[0.3, 0, Math.PI / 5]}>
+          <mesh castShadow>
+            <capsuleGeometry args={[0.055, 0.28, 8, 16]} />
+            <meshStandardMaterial color="#1565C0" />
+          </mesh>
+          {/* Forearm */}
+          <mesh position={[0.06, -0.2, 0.05]} rotation={[0.2, 0, 0.2]} castShadow>
+            <capsuleGeometry args={[0.045, 0.18, 8, 16]} />
+            <meshStandardMaterial color="#1565C0" />
+          </mesh>
+        </group>
+        
+        {/* Bat group - positioned in front of batsman, held by both hands */}
+        <group ref={batGroupRef} position={[-0.35, 0.9, 0.15]} rotation={[0.1, -0.3, -Math.PI / 2.5]}>
+          {/* Handle grip area (where hands hold) - top hand */}
+          <mesh position={[0, 0.38, 0]} castShadow>
+            <cylinderGeometry args={[0.024, 0.024, 0.12, 8]} />
             <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+          {/* Handle grip - bottom hand */}
+          <mesh position={[0, 0.28, 0]} castShadow>
+            <cylinderGeometry args={[0.024, 0.024, 0.1, 8]} />
+            <meshStandardMaterial color="#333333" />
           </mesh>
           {/* Handle */}
           <mesh position={[0, 0.18, 0]} castShadow>
-            <cylinderGeometry args={[0.018, 0.022, 0.18, 8]} />
+            <cylinderGeometry args={[0.02, 0.024, 0.12, 8]} />
             <meshStandardMaterial color="#8B4513" />
           </mesh>
           {/* Blade shoulder */}
-          <mesh position={[0, 0.02, 0]} castShadow>
-            <boxGeometry args={[0.08, 0.12, 0.035]} />
+          <mesh position={[0, 0.04, 0]} castShadow>
+            <boxGeometry args={[0.09, 0.14, 0.04]} />
             <meshStandardMaterial color="#D2B48C" />
           </mesh>
-          {/* Blade main */}
-          <mesh position={[0, -0.22, 0]} castShadow>
-            <boxGeometry args={[0.11, 0.42, 0.04]} />
+          {/* Blade main - larger for visibility */}
+          <mesh position={[0, -0.24, 0]} castShadow>
+            <boxGeometry args={[0.12, 0.48, 0.045]} />
             <meshStandardMaterial color="#DEB887" />
           </mesh>
           {/* Blade toe */}
-          <mesh position={[0, -0.46, 0]} castShadow>
-            <boxGeometry args={[0.1, 0.06, 0.035]} />
+          <mesh position={[0, -0.52, 0]} castShadow>
+            <boxGeometry args={[0.11, 0.08, 0.04]} />
             <meshStandardMaterial color="#D2B48C" />
           </mesh>
-          {/* Bat sticker */}
-          <mesh position={[0, -0.18, 0.022]} castShadow>
-            <boxGeometry args={[0.08, 0.25, 0.002]} />
+          {/* Bat sticker/brand */}
+          <mesh position={[0, -0.2, 0.024]} castShadow>
+            <boxGeometry args={[0.09, 0.28, 0.002]} />
             <meshStandardMaterial color="#CC0000" />
           </mesh>
-          {/* Gloves holding bat */}
-          <mesh position={[0.03, 0.35, 0.02]} castShadow>
-            <sphereGeometry args={[0.045, 8, 8]} />
+          {/* Gloves holding bat - top hand */}
+          <mesh position={[0.02, 0.4, 0.02]} castShadow>
+            <sphereGeometry args={[0.05, 8, 8]} />
             <meshStandardMaterial color="#FFFFFF" />
           </mesh>
-          <mesh position={[-0.03, 0.28, 0.02]} castShadow>
-            <sphereGeometry args={[0.045, 8, 8]} />
+          {/* Gloves - bottom hand */}
+          <mesh position={[-0.02, 0.3, 0.02]} castShadow>
+            <sphereGeometry args={[0.05, 8, 8]} />
             <meshStandardMaterial color="#FFFFFF" />
           </mesh>
         </group>

@@ -39,24 +39,27 @@ export const CricketGame = () => {
   const animationFrameRef = useRef<number>();
   const bowlingStartTimeRef = useRef(0);
   const gameStateRef = useRef<GameState>('idle');
+  const hasSwungRef = useRef(false);
   
-  // Timing window constants
-  const PERFECT_TIMING_START = 0.70;
-  const PERFECT_TIMING_END = 0.90;
-  const BOWLING_DURATION = 2000;
+  // Timing window constants - INCREASED for better playability
+  const PERFECT_TIMING_START = 0.55; // Earlier start
+  const PERFECT_TIMING_END = 0.92;   // Later end
+  const BOWLING_DURATION = 2400;     // Slightly slower bowling
   
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
   
   const calculateRuns = useCallback((timing: number): number => {
+    // timing is normalized 0-1 within the hitting window
+    // 0.5 = perfect timing (middle of the window)
     const normalizedTiming = Math.abs(timing - 0.5) * 2;
     
-    if (normalizedTiming < 0.1) return 6;
-    if (normalizedTiming < 0.25) return 4;
-    if (normalizedTiming < 0.4) return 3;
+    if (normalizedTiming < 0.1) return 6;  // Perfect timing
+    if (normalizedTiming < 0.22) return 4;
+    if (normalizedTiming < 0.38) return 3;
     if (normalizedTiming < 0.55) return 2;
-    if (normalizedTiming < 0.75) return 1;
+    if (normalizedTiming < 0.78) return 1;
     return 0;
   }, []);
   
@@ -78,6 +81,7 @@ export const CricketGame = () => {
     setBowlingProgress(0);
     setCanHit(false);
     hitTimingRef.current = 0;
+    hasSwungRef.current = false;
     bowlingStartTimeRef.current = performance.now();
     
     const animate = () => {
@@ -112,14 +116,18 @@ export const CricketGame = () => {
     setBowlingProgress(0);
     setIsSwinging(false);
     setSwingProgress(0);
+    hasSwungRef.current = false;
     
     setTimeout(() => {
       startBowling();
-    }, 800);
+    }, 900);
   }, [startBowling]);
   
   const handleHit = useCallback(() => {
     if (gameStateRef.current !== 'bowling') return;
+    if (hasSwungRef.current) return; // Prevent multiple swings per ball
+    
+    hasSwungRef.current = true;
     
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -128,32 +136,44 @@ export const CricketGame = () => {
     const timing = hitTimingRef.current;
     const runs = canHit ? calculateRuns(timing) : 0;
     
-    if (runs === 0 && !canHit) {
-      handleOut();
-      return;
-    }
-    
-    setGameState('hitting');
+    // Start swing animation immediately
     setIsSwinging(true);
-    setHitResult(runs);
-    setCurrentRun(runs);
-    setLastShotType(SHOT_TYPES[runs] || 'Miss');
-    setCanHit(false);
+    setGameState('hitting');
     
+    // Animate the swing
     let swingStart = performance.now();
+    const SWING_DURATION = 300; // Longer swing for visibility
+    
     const animateSwing = () => {
       const elapsed = performance.now() - swingStart;
-      const progress = Math.min(elapsed / 200, 1);
+      const progress = Math.min(elapsed / SWING_DURATION, 1);
       setSwingProgress(progress);
       
       if (progress < 1) {
         requestAnimationFrame(animateSwing);
       } else {
-        setIsSwinging(false);
-        setSwingProgress(0);
-        setGameState('result');
+        // Swing complete
+        if (runs === 0) {
+          // Missed - but already swung, so out
+          setIsSwinging(false);
+          setSwingProgress(0);
+          handleOut();
+        } else {
+          // Hit successful
+          setHitResult(runs);
+          setCurrentRun(runs);
+          setLastShotType(SHOT_TYPES[runs] || 'Miss');
+          
+          // Hold swing position briefly then reset
+          setTimeout(() => {
+            setIsSwinging(false);
+            setSwingProgress(0);
+            setGameState('result');
+          }, 200);
+        }
       }
     };
+    
     requestAnimationFrame(animateSwing);
   }, [calculateRuns, handleOut, canHit]);
   
@@ -176,7 +196,7 @@ export const CricketGame = () => {
       } else {
         nextBall();
       }
-    }, 1200);
+    }, 1000);
   }, [ballsRemaining, hitResult, nextBall]);
   
   const startGame = useCallback(() => {
@@ -189,10 +209,11 @@ export const CricketGame = () => {
     setHitResult(null);
     setGameState('idle');
     setBowlingProgress(0);
+    hasSwungRef.current = false;
     
     setTimeout(() => {
       startBowling();
-    }, 800);
+    }, 900);
   }, [startBowling]);
   
   const resetGame = useCallback(() => {
@@ -211,6 +232,7 @@ export const CricketGame = () => {
     setIsSwinging(false);
     setSwingProgress(0);
     setCanHit(false);
+    hasSwungRef.current = false;
   }, []);
   
   useEffect(() => {
@@ -222,7 +244,7 @@ export const CricketGame = () => {
   }, []);
   
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-background">
+    <div className="relative w-full h-screen overflow-hidden bg-background touch-none">
       <GameScene
         gameState={gameState}
         bowlingProgress={bowlingProgress}
