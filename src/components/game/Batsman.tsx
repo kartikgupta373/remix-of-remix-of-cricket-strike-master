@@ -45,7 +45,7 @@ export const Batsman = ({ isSwinging, swingProgress }: BatsmanProps) => {
     } else {
       // Ready stance
       batGroupRef.current.rotation.set(0.1, -0.3, -Math.PI / 2.5);
-      batGroupRef.current.position.set(0.4, 0.95, 0.2);
+      batGroupRef.current.position.set(0.55, 0.95, 0.1);
       bodyRef.current.rotation.y = -0.1;
       bodyRef.current.position.x = 0;
       
@@ -60,7 +60,7 @@ export const Batsman = ({ isSwinging, swingProgress }: BatsmanProps) => {
   
   return (
     // Batsman shifted left of wicket, bat clearly visible on the right
-    <group ref={groupRef} position={[-0.4, 0, 5.5]} rotation={[0, Math.PI * 0.92, 0]}>
+    <group ref={groupRef} position={[-0.7, 0, 5.5]} rotation={[0, Math.PI * 0.15, 0]}>
       <group ref={bodyRef}>
         {/* Torso */}
         <mesh position={[0, 1.0, 0]} castShadow>
@@ -134,7 +134,7 @@ export const Batsman = ({ isSwinging, swingProgress }: BatsmanProps) => {
         </mesh>
         
         {/* Bat group - positioned to the right of batsman */}
-        <group ref={batGroupRef} position={[0.4, 0.95, 0.2]} rotation={[0.1, -0.3, -Math.PI / 2.5]}>
+        <group ref={batGroupRef} position={[0.55, 0.95, 0.1]} rotation={[0.1, 0.3, -Math.PI / 2.5]}>
           {/* Handle grip */}
           <mesh position={[0, 0.35, 0]} castShadow>
             <cylinderGeometry args={[0.022, 0.022, 0.2, 8]} />

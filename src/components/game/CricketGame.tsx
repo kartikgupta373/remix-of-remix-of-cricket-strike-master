@@ -41,9 +41,10 @@ export const CricketGame = () => {
   const gameStateRef = useRef<GameState>('idle');
   const hasSwungRef = useRef(false);
   
-  // Timing window constants - INCREASED for better playability
-  const PERFECT_TIMING_START = 0.55; // Earlier start
-  const PERFECT_TIMING_END = 0.92;   // Later end
+  // Timing window constants - Ball releases at 0.55, so hit window starts later
+  // when ball is actually approaching the batsman
+  const PERFECT_TIMING_START = 0.75; // Start glow when ball is closer to batsman
+  const PERFECT_TIMING_END = 0.92;   // End timing window
   const BOWLING_DURATION = 2400;     // Slightly slower bowling
   
   useEffect(() => {

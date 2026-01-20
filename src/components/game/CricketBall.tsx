@@ -28,22 +28,31 @@ export const CricketBall = ({
   // Realistic ball trajectory during bowling with CLEAR bounce
   // Ball only starts moving after release point
   const getBowlingPosition = (progress: number): [number, number, number] => {
-    // Before release, ball stays in bowler's hand
+    // Before release, ball stays in bowler's hand at proper hand height
     if (progress < BALL_RELEASE_POINT) {
       // Follow bowler's hand position during run-up and delivery
       const runProgress = Math.min(progress / 0.4, 1);
       const bowlerZ = -14 + runProgress * 4;
       
-      // During delivery stride (0.4 - 0.55), arm rotates
+      // Bowler's arm group is at position [0.28, 1.25, 0] 
+      // Hand is at relative position [0.08, 0.55, 0] from arm pivot
+      // So absolute hand Y = 1.25 + 0.55 = 1.8 during idle
+      
+      // During delivery stride (0.4 - 0.55), arm rotates in windmill motion
       if (progress >= 0.4) {
         const deliveryProgress = (progress - 0.4) / 0.15;
-        const armAngle = deliveryProgress * Math.PI * 1.5;
-        const handY = 1.25 + Math.sin(armAngle) * 0.8;
-        const handZ = bowlerZ + Math.cos(armAngle) * 0.5;
-        return [0.35, Math.max(1.5, handY + 0.8), handZ];
+        // Arm does full windmill rotation: armRef.rotation.x = -deliveryProgress * Math.PI * 2
+        const armAngle = -deliveryProgress * Math.PI * 2;
+        // Hand orbits around shoulder pivot (at Y=1.25)
+        const shoulderY = 1.25;
+        const armLength = 0.55; // distance from shoulder to hand
+        const handY = shoulderY + Math.sin(armAngle + Math.PI/2) * armLength;
+        const handZ = bowlerZ + Math.cos(armAngle + Math.PI/2) * armLength * 0.5;
+        return [0.35, Math.max(0.8, handY), handZ];
       }
       
-      return [0.35, 2.5, bowlerZ];
+      // During run-up, ball is in bowler's hand at side (arm down position)
+      return [0.35, 1.8, bowlerZ];
     }
     
     // After release - ball travels to batsman
@@ -208,8 +217,8 @@ export const CricketBall = ({
       const pos = getOutPosition(bowlingProgress);
       ballRef.current.position.set(...pos);
     } else if (ballState === 'idle') {
-      // Ball at bowler's hand position
-      ballRef.current.position.set(0.35, 2.5, -14);
+      // Ball at bowler's hand position (proper hand height)
+      ballRef.current.position.set(0.35, 1.8, -14);
     }
   });
   
@@ -222,7 +231,7 @@ export const CricketBall = ({
   }, [ballState]);
   
   return (
-    <group ref={ballRef} position={[0.35, 2.5, -14]}>
+    <group ref={ballRef} position={[0.35, 1.8, -14]}>
       {/* Main ball - larger and more visible */}
       <mesh castShadow>
         <sphereGeometry args={[0.055, 24, 24]} />
