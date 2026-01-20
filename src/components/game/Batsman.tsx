@@ -66,8 +66,8 @@ export const Batsman = ({ isSwinging, swingProgress }: BatsmanProps) => {
   });
   
   return (
-    // Batsman positioned on the left side of the bat, facing bowler
-    <group ref={groupRef} position={[0.3, 0, 5.5]} rotation={[0, Math.PI, 0]}>
+    // Batsman shifted left of wicket, bat clearly visible on the right
+    <group ref={groupRef} position={[-0.35, 0, 5.5]} rotation={[0, Math.PI * 0.92, 0]}>
       <group ref={bodyRef}>
         {/* Torso */}
         <mesh position={[0, 1.0, 0]} castShadow>
