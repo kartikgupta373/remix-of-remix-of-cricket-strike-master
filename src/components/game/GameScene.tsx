@@ -34,42 +34,50 @@ export const GameScene = ({
     : 'idle';
   
   return (
-    <Canvas shadows className="touch-none">
+    <Canvas shadows className="touch-none" dpr={[1, 2]}>
       <Suspense fallback={null}>
-        {/* Camera behind and slightly above the batsman */}
+        {/* Camera behind and slightly above the batsman - optimized for mobile viewing */}
         <PerspectiveCamera 
           makeDefault 
-          position={[0.5, 2.2, 9.5]} 
-          fov={55}
-          rotation={[-0.05, 0, 0]}
+          position={[0.8, 2.5, 10]} 
+          fov={50}
+          rotation={[-0.08, 0.02, 0]}
         />
         
-        {/* Scene lighting */}
-        <ambientLight intensity={0.5} />
+        {/* Scene lighting - enhanced for visibility */}
+        <ambientLight intensity={0.6} />
         <directionalLight
-          position={[15, 30, 10]}
-          intensity={1.2}
+          position={[15, 35, 10]}
+          intensity={1.4}
           castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-          shadow-camera-far={100}
-          shadow-camera-left={-30}
-          shadow-camera-right={30}
-          shadow-camera-top={30}
-          shadow-camera-bottom={-30}
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          shadow-camera-far={80}
+          shadow-camera-left={-25}
+          shadow-camera-right={25}
+          shadow-camera-top={25}
+          shadow-camera-bottom={-25}
         />
-        <hemisphereLight args={['#87CEEB', '#2E7D32', 0.4]} />
+        <hemisphereLight args={['#87CEEB', '#2E7D32', 0.5]} />
         
-        {/* Stadium environment */}
+        {/* Point light to illuminate the batting area */}
+        <pointLight position={[0, 8, 5]} intensity={0.8} distance={20} />
+        
+        {/* RENDER ORDER: Background to Foreground */}
+        
+        {/* 1. Stadium environment - furthest back */}
         <Stadium />
         
-        {/* Batsman's stumps - BEHIND batsman, closer to camera (z = 7) */}
-        <Stumps position={[0, 0, 7]} bailsFallen={isOut} />
+        {/* 2. Bowler - at the far end */}
+        <Bowler 
+          isBowling={gameState === 'bowling' || gameState === 'out'} 
+          bowlingProgress={bowlingProgress} 
+        />
         
-        {/* Bowler's stumps - at bowler's end (z = -10) */}
+        {/* 3. Bowler's stumps - at bowler's end */}
         <Stumps position={[0, 0, -10]} />
         
-        {/* Cricket Ball */}
+        {/* 4. Cricket Ball - travels from bowler to batsman */}
         <CricketBall 
           ballState={ballState}
           bowlingProgress={bowlingProgress}
@@ -78,17 +86,14 @@ export const GameScene = ({
           onAnimationComplete={onAnimationComplete}
         />
         
-        {/* Batsman - standing in front of stumps, on the crease (z = 6) */}
+        {/* 5. Batsman - standing on crease, in front of his stumps */}
         <Batsman isSwinging={isSwinging} swingProgress={swingProgress} />
         
-        {/* Bowler - runs in from z = -14 */}
-        <Bowler 
-          isBowling={gameState === 'bowling' || gameState === 'out'} 
-          bowlingProgress={bowlingProgress} 
-        />
+        {/* 6. Batsman's stumps - CLOSEST to camera, behind batsman */}
+        <Stumps position={[0, 0, 6.5]} bailsFallen={isOut} />
         
-        {/* Atmospheric fog */}
-        <fog attach="fog" args={['#87CEEB', 40, 120]} />
+        {/* Atmospheric fog - reduced for better visibility */}
+        <fog attach="fog" args={['#87CEEB', 50, 130]} />
       </Suspense>
     </Canvas>
   );

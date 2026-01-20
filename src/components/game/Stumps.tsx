@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface StumpsProps {
@@ -7,82 +8,68 @@ interface StumpsProps {
 }
 
 export const Stumps = ({ position, bailsFallen = false }: StumpsProps) => {
-  const groupRef = useRef<THREE.Group>(null);
+  const bailsRef = useRef<THREE.Group>(null);
+  const stumpsGroupRef = useRef<THREE.Group>(null);
+  const bailFallProgress = useRef(0);
+  
+  useFrame((state, delta) => {
+    if (bailsFallen && bailsRef.current && bailFallProgress.current < 1) {
+      bailFallProgress.current += delta * 3;
+      
+      // Animate bails falling dramatically
+      bailsRef.current.rotation.z += delta * 10;
+      bailsRef.current.rotation.x += delta * 5;
+      bailsRef.current.position.y -= delta * 2.5;
+      bailsRef.current.position.z -= delta * 1.2;
+    }
+  });
   
   const stumpHeight = 0.72;
-  const stumpRadius = 0.018;
+  const stumpRadius = 0.016;
   const stumpSpacing = 0.115;
-  const bailLength = 0.115;
-  const bailRadius = 0.012;
   
   return (
-    <group ref={groupRef} position={position}>
-      {/* Three stumps */}
-      {[-stumpSpacing, 0, stumpSpacing].map((offset, i) => (
-        <group key={i}>
-          {/* Stump */}
-          <mesh position={[offset, stumpHeight / 2, 0]} castShadow>
-            <cylinderGeometry args={[stumpRadius, stumpRadius * 1.1, stumpHeight, 12]} />
-            <meshStandardMaterial color="#DEB887" roughness={0.6} />
-          </mesh>
-          {/* Stump tip */}
-          <mesh position={[offset, stumpHeight + 0.015, 0]} castShadow>
-            <coneGeometry args={[stumpRadius * 1.2, 0.03, 12]} />
-            <meshStandardMaterial color="#DEB887" roughness={0.6} />
-          </mesh>
-        </group>
-      ))}
+    <group position={position}>
+      <group ref={stumpsGroupRef}>
+        {/* Three stumps */}
+        {[-stumpSpacing, 0, stumpSpacing].map((offset, i) => (
+          <group key={i}>
+            {/* Stump body */}
+            <mesh position={[offset, stumpHeight / 2, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[stumpRadius, stumpRadius * 1.15, stumpHeight, 12]} />
+              <meshStandardMaterial 
+                color="#F5DEB3" 
+                roughness={0.55}
+                metalness={0.05}
+              />
+            </mesh>
+            {/* Stump top */}
+            <mesh position={[offset, stumpHeight + 0.012, 0]} castShadow>
+              <cylinderGeometry args={[stumpRadius * 1.25, stumpRadius, 0.025, 12]} />
+              <meshStandardMaterial color="#E8D4A8" />
+            </mesh>
+          </group>
+        ))}
+      </group>
       
       {/* Bails */}
-      {!bailsFallen ? (
-        <>
-          {/* Left bail */}
-          <mesh 
-            position={[-stumpSpacing / 2, stumpHeight + 0.035, 0]} 
-            rotation={[0, 0, Math.PI / 2]}
-          >
-            <cylinderGeometry args={[bailRadius, bailRadius, bailLength, 8]} />
-            <meshStandardMaterial color="#CD853F" roughness={0.5} />
-          </mesh>
-          {/* Right bail */}
-          <mesh 
-            position={[stumpSpacing / 2, stumpHeight + 0.035, 0]} 
-            rotation={[0, 0, Math.PI / 2]}
-          >
-            <cylinderGeometry args={[bailRadius, bailRadius, bailLength, 8]} />
-            <meshStandardMaterial color="#CD853F" roughness={0.5} />
-          </mesh>
-        </>
-      ) : (
-        <>
-          {/* Fallen bails - flying off dramatically */}
-          <mesh 
-            position={[-stumpSpacing - 0.15, stumpHeight - 0.1, 0.15]} 
-            rotation={[Math.PI / 3, Math.PI / 5, Math.PI / 2]}
-          >
-            <cylinderGeometry args={[bailRadius, bailRadius, bailLength, 8]} />
-            <meshStandardMaterial color="#CD853F" roughness={0.5} />
-          </mesh>
-          <mesh 
-            position={[stumpSpacing + 0.2, stumpHeight - 0.25, -0.1]} 
-            rotation={[-Math.PI / 4, -Math.PI / 3, Math.PI / 3]}
-          >
-            <cylinderGeometry args={[bailRadius, bailRadius, bailLength, 8]} />
-            <meshStandardMaterial color="#CD853F" roughness={0.5} />
-          </mesh>
-          
-          {/* Middle stump knocked back slightly */}
-          <mesh position={[0, stumpHeight / 2 - 0.05, 0.08]} rotation={[0.15, 0, 0]} castShadow>
-            <cylinderGeometry args={[stumpRadius, stumpRadius * 1.1, stumpHeight, 12]} />
-            <meshStandardMaterial color="#DEB887" roughness={0.6} />
-          </mesh>
-        </>
-      )}
+      <group ref={bailsRef} position={[0, stumpHeight + 0.028, 0]}>
+        {/* Left bail */}
+        <mesh position={[-stumpSpacing / 2, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+          <cylinderGeometry args={[0.009, 0.009, stumpSpacing * 0.88, 8]} />
+          <meshStandardMaterial color="#CD853F" roughness={0.45} />
+        </mesh>
+        {/* Right bail */}
+        <mesh position={[stumpSpacing / 2, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+          <cylinderGeometry args={[0.009, 0.009, stumpSpacing * 0.88, 8]} />
+          <meshStandardMaterial color="#CD853F" roughness={0.45} />
+        </mesh>
+      </group>
       
-      {/* Ground marking at base of stumps */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
-        <planeGeometry args={[0.5, 0.1]} />
-        <meshStandardMaterial color="#FFFFFF" opacity={0.8} transparent />
+      {/* Crease line */}
+      <mesh position={[0, 0.006, 0.28]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[0.85, 0.045]} />
+        <meshStandardMaterial color="#FFFFFF" roughness={0.85} />
       </mesh>
     </group>
   );
