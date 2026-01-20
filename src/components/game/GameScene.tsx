@@ -1,7 +1,6 @@
-import { Suspense, useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Suspense } from 'react';
+import { Canvas } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
-import * as THREE from 'three';
 import { Stadium } from './Stadium';
 import { Stumps } from './Stumps';
 import { CricketBall } from './CricketBall';
@@ -18,19 +17,6 @@ interface GameSceneProps {
   onBallReachBat: () => void;
   onAnimationComplete: () => void;
 }
-
-const CameraController = () => {
-  const { camera } = useThree();
-  const targetRef = useRef(new THREE.Vector3(0, 2, -5));
-  
-  useFrame(() => {
-    // Behind the batsman perspective
-    camera.position.lerp(new THREE.Vector3(0, 2.5, 12), 0.02);
-    camera.lookAt(targetRef.current);
-  });
-  
-  return null;
-};
 
 export const GameScene = ({ 
   gameState, 
@@ -50,19 +36,40 @@ export const GameScene = ({
   return (
     <Canvas shadows className="touch-none">
       <Suspense fallback={null}>
-        <PerspectiveCamera makeDefault position={[0, 2.5, 12]} fov={60} />
-        <CameraController />
+        {/* Camera behind and slightly above the batsman */}
+        <PerspectiveCamera 
+          makeDefault 
+          position={[0.5, 2.2, 9.5]} 
+          fov={55}
+          rotation={[-0.05, 0, 0]}
+        />
         
-        {/* Scene */}
+        {/* Scene lighting */}
+        <ambientLight intensity={0.5} />
+        <directionalLight
+          position={[15, 30, 10]}
+          intensity={1.2}
+          castShadow
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+          shadow-camera-far={100}
+          shadow-camera-left={-30}
+          shadow-camera-right={30}
+          shadow-camera-top={30}
+          shadow-camera-bottom={-30}
+        />
+        <hemisphereLight args={['#87CEEB', '#2E7D32', 0.4]} />
+        
+        {/* Stadium environment */}
         <Stadium />
         
-        {/* Stumps at batsman end */}
-        <Stumps position={[0, 0, 8.5]} bailsFallen={isOut} />
+        {/* Batsman's stumps - BEHIND batsman, closer to camera (z = 7) */}
+        <Stumps position={[0, 0, 7]} bailsFallen={isOut} />
         
-        {/* Stumps at bowler end */}
+        {/* Bowler's stumps - at bowler's end (z = -10) */}
         <Stumps position={[0, 0, -10]} />
         
-        {/* Ball */}
+        {/* Cricket Ball */}
         <CricketBall 
           ballState={ballState}
           bowlingProgress={bowlingProgress}
@@ -71,14 +78,17 @@ export const GameScene = ({
           onAnimationComplete={onAnimationComplete}
         />
         
-        {/* Batsman */}
+        {/* Batsman - standing in front of stumps, on the crease (z = 6) */}
         <Batsman isSwinging={isSwinging} swingProgress={swingProgress} />
         
-        {/* Bowler */}
-        <Bowler isBowling={gameState === 'bowling' || gameState === 'out'} bowlingProgress={bowlingProgress} />
+        {/* Bowler - runs in from z = -14 */}
+        <Bowler 
+          isBowling={gameState === 'bowling' || gameState === 'out'} 
+          bowlingProgress={bowlingProgress} 
+        />
         
-        {/* Fog for depth */}
-        <fog attach="fog" args={['#87CEEB', 30, 100]} />
+        {/* Atmospheric fog */}
+        <fog attach="fog" args={['#87CEEB', 40, 120]} />
       </Suspense>
     </Canvas>
   );
