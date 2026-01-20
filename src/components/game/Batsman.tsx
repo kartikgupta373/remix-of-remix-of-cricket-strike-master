@@ -133,8 +133,8 @@ export const Batsman = ({ isSwinging, swingProgress }: BatsmanProps) => {
           <meshStandardMaterial color="#1565C0" />
         </mesh>
         
-        {/* Bat group - positioned to the right of batsman */}
-        <group ref={batGroupRef} position={[0.55, 0.95, 0.1]} rotation={[0.1, 0.3, -Math.PI / 2.5]}>
+        {/* Bat group - positioned to the right of batsman, mirrored for right-hand grip */}
+        <group ref={batGroupRef} position={[0.55, 0.95, 0.1]} rotation={[0.1, 0.3, -Math.PI / 2.5]} scale={[-1, 1, 1]}>
           {/* Handle grip */}
           <mesh position={[0, 0.35, 0]} castShadow>
             <cylinderGeometry args={[0.022, 0.022, 0.2, 8]} />
