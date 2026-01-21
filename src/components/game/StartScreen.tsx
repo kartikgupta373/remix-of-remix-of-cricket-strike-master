@@ -10,7 +10,7 @@ export const StartScreen = ({ onStart }: StartScreenProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-b from-background/90 to-background/70 backdrop-blur-sm"
+      className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-b from-background/80 via-background/60 to-transparent"
     >
       <motion.div
         initial={{ scale: 0.5, y: 50 }}
