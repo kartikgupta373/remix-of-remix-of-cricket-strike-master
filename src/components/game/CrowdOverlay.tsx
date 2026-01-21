@@ -1,14 +1,16 @@
 import crowdVideo from '@/assets/crowd cheer 3.mp4';
 
 export const CrowdOverlay = () => {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
   return (
     <div
       className="absolute inset-x-0 pointer-events-none overflow-hidden"
       style={{
-        top: '10%',
-        height: '45%',
-        zIndex: 1,
-        scale: '.75',
+        top: isMobile ? '6%' : '10%',
+        height: isMobile ? '55%' : '45%',
+        zIndex: .1,
+        scale: isMobile ? '3' : '.75',
         marginLeft: '2.4%',
       }}
     >

@@ -14,18 +14,18 @@ export const GameHUD = ({ score, ballsRemaining, currentRun, lastShotType }: Gam
     if (run >= 2) return 'text-blue-400';
     return 'text-white';
   };
-  
+
   return (
     <div className="absolute top-0 left-0 right-0 z-10 p-4 pointer-events-none">
       <div className="flex justify-between items-start max-w-md mx-auto">
         {/* Score */}
-        <motion.div 
+        <motion.div
           className="glass-panel rounded-lg px-4 py-2"
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
         >
           <p className="text-foreground/60 text-xs uppercase tracking-wider">Score</p>
-          <motion.p 
+          <motion.p
             key={score}
             initial={{ scale: 1.3 }}
             animate={{ scale: 1 }}
@@ -34,9 +34,9 @@ export const GameHUD = ({ score, ballsRemaining, currentRun, lastShotType }: Gam
             {score}
           </motion.p>
         </motion.div>
-        
+
         {/* Balls remaining */}
-        <motion.div 
+        <motion.div
           className="glass-panel rounded-lg px-4 py-2 text-right"
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -46,11 +46,10 @@ export const GameHUD = ({ score, ballsRemaining, currentRun, lastShotType }: Gam
             {[...Array(6)].map((_, i) => (
               <motion.div
                 key={i}
-                className={`w-3 h-3 rounded-full ${
-                  i < (6 - ballsRemaining) 
-                    ? 'bg-foreground/30' 
+                className={`w-3 h-3 rounded-full ${i < (6 - ballsRemaining)
+                    ? 'bg-foreground/30'
                     : 'bg-primary'
-                }`}
+                  }`}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: i * 0.05 }}
@@ -59,7 +58,7 @@ export const GameHUD = ({ score, ballsRemaining, currentRun, lastShotType }: Gam
           </div>
         </motion.div>
       </div>
-      
+
       {/* Current run popup */}
       <AnimatePresence>
         {currentRun !== null && (
@@ -71,9 +70,9 @@ export const GameHUD = ({ score, ballsRemaining, currentRun, lastShotType }: Gam
             className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2"
           >
             <div className={`run-popup text-center ${getRunColor(currentRun)}`}>
-              <motion.span 
-                className="game-title text-8xl md:text-9xl block"
-                animate={{ 
+              <motion.span
+                className="game-title text-4xl md:text-5xl block"
+                animate={{
                   scale: currentRun === 6 ? [1, 1.2, 1] : 1,
                   rotate: currentRun === 6 ? [0, -5, 5, 0] : 0
                 }}
@@ -82,7 +81,7 @@ export const GameHUD = ({ score, ballsRemaining, currentRun, lastShotType }: Gam
                 {currentRun}
               </motion.span>
               {lastShotType && (
-                <motion.span 
+                <motion.span
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-lg font-game uppercase tracking-wider"
@@ -91,7 +90,7 @@ export const GameHUD = ({ score, ballsRemaining, currentRun, lastShotType }: Gam
                 </motion.span>
               )}
             </div>
-            
+
             {/* Special effects for boundaries */}
             {currentRun === 4 && (
               <motion.div
