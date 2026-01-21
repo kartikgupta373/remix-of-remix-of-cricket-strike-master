@@ -37,7 +37,7 @@ export const Batsman = ({ isSwinging, swingProgress }: BatsmanProps) => {
 
   return (
     // Batsman shifted left of wicket, bat clearly visible on the right
-    <group ref={groupRef} position={[-0.7, 0, 5.5]} rotation={[0, Math.PI * 0.15, 0]}>
+    <group ref={groupRef} position={[-0.7, 0.1, 5.5]} rotation={[0, Math.PI * 0.15, 0]}>
       {/* Stickman image */}
       <mesh position={[0, 1.0, 0.1]} castShadow>
         <planeGeometry args={[1, 2]} /> {/* Adjusted for better aspect ratio */}
