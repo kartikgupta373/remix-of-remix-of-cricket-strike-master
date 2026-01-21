@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { PerspectiveCamera } from '@react-three/drei';
+import { PerspectiveCamera, useVideoTexture } from '@react-three/drei';
 import { Stadium } from './Stadium';
 import { Stumps } from './Stumps';
 import { CricketBall } from './CricketBall';

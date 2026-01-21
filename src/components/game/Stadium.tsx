@@ -9,9 +9,9 @@ export const Stadium = () => {
       <mesh position={[0, 0, 0]} scale={[-1, 1, 1]}>
         <sphereGeometry args={[120, 32, 32]} />
         <meshBasicMaterial side={THREE.BackSide}>
-          <primitive 
-            attach="map" 
-            object={createGradientTexture('#4da6ff', '#87CEEB')} 
+          <primitive
+            attach="map"
+            object={createGradientTexture('#4da6ff', '#87CEEB')}
           />
         </meshBasicMaterial>
       </mesh>
@@ -28,7 +28,7 @@ export const Stadium = () => {
         <circleGeometry args={[55, 64]} />
         <meshStandardMaterial color="#2E7D32" />
       </mesh>
-      
+
       {/* Inner circle grass (slightly different shade) */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.03, -2]} receiveShadow>
         <circleGeometry args={[30, 48]} />
@@ -46,7 +46,7 @@ export const Stadium = () => {
         <planeGeometry args={[3.05, 22]} />
         <meshStandardMaterial color="#C4A35A" roughness={0.8} />
       </mesh>
-      
+
       {/* Pitch markings - batting crease */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, 6]}>
         <planeGeometry args={[2.6, 0.05]} />
@@ -66,7 +66,7 @@ export const Stadium = () => {
         <planeGeometry args={[0.05, 1.2]} />
         <meshStandardMaterial color="#FFFFFF" />
       </mesh>
-      
+
       {/* Bowler's crease */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.025, -10]}>
         <planeGeometry args={[2.6, 0.05]} />
@@ -74,10 +74,10 @@ export const Stadium = () => {
       </mesh>
 
       {/* Stadium stands - simplified background without detailed crowd (crowd is 2D overlay now) */}
-      <StadiumStand position={[-55, 0, -2]} rotation={[0, Math.PI / 2, 0]} />
-      <StadiumStand position={[55, 0, -2]} rotation={[0, -Math.PI / 2, 0]} />
+      {/* <StadiumStand position={[-55, 0, -2]} rotation={[0, Math.PI / 2, 0]} />
+      <StadiumStand position={[55, 0, -2]} rotation={[0, -Math.PI / 2, 0]} /> */}
       <StadiumStand position={[0, 0, -60]} rotation={[0, 0, 0]} />
-      
+
       {/* Sightscreen behind bowler */}
       <mesh position={[0, 8, -65]}>
         <boxGeometry args={[20, 16, 1]} />
@@ -141,15 +141,15 @@ function createGradientTexture(topColor: string, bottomColor: string): THREE.Tex
   canvas.width = 2;
   canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
-  
+
   const gradient = ctx.createLinearGradient(0, 0, 0, 512);
   gradient.addColorStop(0, topColor);
   gradient.addColorStop(0.6, bottomColor);
   gradient.addColorStop(1, '#B3E5FC');
-  
+
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 2, 512);
-  
+
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
   return texture;

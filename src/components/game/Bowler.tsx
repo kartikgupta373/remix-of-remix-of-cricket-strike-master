@@ -48,7 +48,7 @@ export const Bowler = ({ isBowling, bowlingProgress }: BowlerProps) => {
         groupRef.current.position.z = -10;
 
         // Jump arc
-        groupRef.current.position.y = Math.sin(deliveryProgress * Math.PI) * 0.4;
+        // groupRef.current.position.y = Math.sin(deliveryProgress * Math.PI) * 0.4;
 
         // Bowling arm windmill - full rotation
         if (armRef.current) {

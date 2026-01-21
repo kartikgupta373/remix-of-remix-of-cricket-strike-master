@@ -7,10 +7,10 @@ export const CrowdOverlay = () => {
     <div
       className="absolute inset-x-0 pointer-events-none overflow-hidden"
       style={{
-        top: isMobile ? '6%' : '10%',
+        top: isMobile ? '1%' : '10%',
         height: isMobile ? '55%' : '45%',
-        zIndex: .1,
-        scale: isMobile ? '3' : '.75',
+        zIndex: 0,
+        scale: isMobile ? '2' : '.75',
         marginLeft: '2.4%',
       }}
     >
