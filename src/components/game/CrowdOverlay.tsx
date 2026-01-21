@@ -3,49 +3,23 @@ import crowdImage from '@/assets/crowd.png';
 export const CrowdOverlay = () => {
   return (
     <div className="absolute inset-x-0 top-0 pointer-events-none z-0 overflow-hidden">
-      {/* Main crowd band - positioned at the top of the viewport */}
-      <div className="relative w-full" style={{ height: '35vh' }}>
-        {/* Crowd image repeated to fill width */}
-        <div 
-          className="absolute inset-0 flex items-end justify-center"
+      {/* Single crowd image positioned at the grey background area */}
+      <div 
+        className="relative w-full flex justify-center items-end"
+        style={{ 
+          height: '40vh',
+          paddingTop: '5vh',
+        }}
+      >
+        <img 
+          src={crowdImage} 
+          alt="" 
+          className="w-full h-auto object-cover object-bottom opacity-95"
           style={{ 
-            paddingTop: '8vh',
+            maxHeight: '30vh',
+            minWidth: '100%',
           }}
-        >
-          {/* Left crowd section */}
-          <img 
-            src={crowdImage} 
-            alt="" 
-            className="h-auto object-cover opacity-95"
-            style={{ 
-              width: '40%',
-              maxHeight: '22vh',
-              objectPosition: 'center bottom',
-            }}
-          />
-          {/* Center crowd section */}
-          <img 
-            src={crowdImage} 
-            alt="" 
-            className="h-auto object-cover opacity-95"
-            style={{ 
-              width: '40%',
-              maxHeight: '22vh',
-              objectPosition: 'center bottom',
-            }}
-          />
-          {/* Right crowd section */}
-          <img 
-            src={crowdImage} 
-            alt="" 
-            className="h-auto object-cover opacity-95"
-            style={{ 
-              width: '40%',
-              maxHeight: '22vh',
-              objectPosition: 'center bottom',
-            }}
-          />
-        </div>
+        />
       </div>
     </div>
   );
