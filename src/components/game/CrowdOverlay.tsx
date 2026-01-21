@@ -5,10 +5,10 @@ export const CrowdOverlay = () => {
     <div
       className="absolute inset-x-0 pointer-events-none overflow-hidden"
       style={{
-        top: '32%',
+        top: '30%',
         height: '35%',
         zIndex: 1,
-        scale: '2.8',
+        scale: '2.75',
       }}
     >
       {/* Single crowd image that covers the grey stadium background area */}
