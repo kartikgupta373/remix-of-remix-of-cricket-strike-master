@@ -32,7 +32,7 @@ export const StartScreen = ({ onStart }: StartScreenProps) => {
           className="glass-panel rounded-xl p-6 mb-8 max-w-sm mx-auto"
         >
           <p className="text-foreground/90 text-sm mb-4">
-            🏏 Face 6 balls (1 Over)
+            🏏 Ankit, Face 6 balls (1 Over)
           </p>
           <p className="text-foreground/70 text-xs">
             Tap at the right moment to hit!
