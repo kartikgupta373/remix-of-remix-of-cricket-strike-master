@@ -1,25 +1,29 @@
-import crowdImage from '@/assets/crowd.png';
+import crowdVideo from '@/assets/crowd cheer 3.mp4';
 
 export const CrowdOverlay = () => {
   return (
-    <div 
+    <div
       className="absolute inset-x-0 pointer-events-none overflow-hidden"
       style={{
-        top: '30%',
-        height: '35%',
+        top: '10%',
+        height: '45%',
         zIndex: 1,
-        scale: '2.75',
+        scale: '.75',
+        marginLeft: '2.4%',
       }}
     >
-      {/* Single crowd image that covers the grey stadium background area */}
+      {/* Single crowd video that covers the grey stadium background area */}
       <div className="w-full h-full flex items-center justify-center">
-        <img 
-          src={crowdImage} 
-          alt="Stadium crowd" 
+        <video
+          src={crowdVideo}
           className="w-full h-full object-contain object-center"
-          style={{ 
+          style={{
             filter: 'brightness(1.1) saturate(1.1)',
           }}
+          autoPlay
+          loop
+          muted
+          playsInline
         />
       </div>
     </div>
