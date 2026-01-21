@@ -260,8 +260,8 @@ export const CricketGame = () => {
         />
       </div>
       
-      {/* Crowd overlay - always visible during gameplay */}
-      {phase === 'playing' && <CrowdOverlay />}
+      {/* Crowd overlay - always visible, behind all UI screens */}
+      <CrowdOverlay />
       
       <AnimatePresence mode="wait">
         {phase === 'start' && (
