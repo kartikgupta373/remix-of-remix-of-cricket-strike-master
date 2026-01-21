@@ -6,6 +6,7 @@ import { OutScreen } from './OutScreen';
 import { GameOverScreen } from './GameOverScreen';
 import { GameHUD } from './GameHUD';
 import { HitButton } from './HitButton';
+import { CrowdOverlay } from './CrowdOverlay';
 
 type GamePhase = 'start' | 'playing' | 'out' | 'gameover';
 type GameState = 'idle' | 'bowling' | 'hitting' | 'result' | 'out';
@@ -244,17 +245,23 @@ export const CricketGame = () => {
   }, []);
   
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-background touch-none">
-      <GameScene
-        gameState={gameState}
-        bowlingProgress={bowlingProgress}
-        isSwinging={isSwinging}
-        swingProgress={swingProgress}
-        hitResult={hitResult}
-        isOut={isOut}
-        onBallReachBat={onBallReachBat}
-        onAnimationComplete={onAnimationComplete}
-      />
+    <div className="relative w-full h-[100dvh] overflow-hidden bg-background touch-none select-none">
+      {/* Game canvas with proper mobile aspect ratio */}
+      <div className="absolute inset-0">
+        <GameScene
+          gameState={gameState}
+          bowlingProgress={bowlingProgress}
+          isSwinging={isSwinging}
+          swingProgress={swingProgress}
+          hitResult={hitResult}
+          isOut={isOut}
+          onBallReachBat={onBallReachBat}
+          onAnimationComplete={onAnimationComplete}
+        />
+      </div>
+      
+      {/* Crowd overlay - always visible during gameplay */}
+      {phase === 'playing' && <CrowdOverlay />}
       
       <AnimatePresence mode="wait">
         {phase === 'start' && (

@@ -3,16 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 export const Stadium = () => {
-  const crowdRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    if (crowdRef.current) {
-      crowdRef.current.children.forEach((child, i) => {
-        child.position.y = Math.sin(state.clock.elapsedTime * 2 + i * 0.5) * 0.03;
-      });
-    }
-  });
-
   return (
     <group>
       {/* Sky dome */}
@@ -83,7 +73,7 @@ export const Stadium = () => {
         <meshStandardMaterial color="#FFFFFF" />
       </mesh>
 
-      {/* Stadium stands */}
+      {/* Stadium stands - simplified background without detailed crowd (crowd is 2D overlay now) */}
       <StadiumStand position={[-55, 0, -2]} rotation={[0, Math.PI / 2, 0]} />
       <StadiumStand position={[55, 0, -2]} rotation={[0, -Math.PI / 2, 0]} />
       <StadiumStand position={[0, 0, -60]} rotation={[0, 0, 0]} />
@@ -93,13 +83,6 @@ export const Stadium = () => {
         <boxGeometry args={[20, 16, 1]} />
         <meshStandardMaterial color="#FFFFFF" />
       </mesh>
-
-      {/* Crowd */}
-      <group ref={crowdRef}>
-        <CrowdSection position={[-50, 10, -2]} />
-        <CrowdSection position={[50, 10, -2]} />
-        <CrowdSection position={[0, 10, -55]} />
-      </group>
 
       {/* Floodlights */}
       <FloodLight position={[-45, 0, -45]} />
@@ -112,7 +95,7 @@ export const Stadium = () => {
 
 const StadiumStand = ({ position, rotation }: { position: [number, number, number]; rotation: [number, number, number] }) => (
   <group position={position} rotation={rotation}>
-    {/* Lower tier */}
+    {/* Lower tier - solid color for crowd PNG overlay */}
     <mesh position={[0, 8, 0]}>
       <boxGeometry args={[90, 16, 12]} />
       <meshStandardMaterial color="#455A64" />
@@ -129,27 +112,6 @@ const StadiumStand = ({ position, rotation }: { position: [number, number, numbe
     </mesh>
   </group>
 );
-
-const CrowdSection = ({ position }: { position: [number, number, number] }) => {
-  const colors = ['#1E88E5', '#E53935', '#43A047', '#FB8C00', '#8E24AA', '#00ACC1', '#FFD600', '#FFFFFF'];
-  const dots = [];
-  
-  for (let i = 0; i < 150; i++) {
-    const x = (Math.random() - 0.5) * 40;
-    const y = (Math.random() - 0.5) * 12;
-    const z = (Math.random() - 0.5) * 6;
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    
-    dots.push(
-      <mesh key={i} position={[x, y, z]}>
-        <sphereGeometry args={[0.35, 6, 6]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
-    );
-  }
-  
-  return <group position={position}>{dots}</group>;
-};
 
 const FloodLight = ({ position }: { position: [number, number, number] }) => (
   <group position={position}>
