@@ -2,21 +2,22 @@ import crowdImage from '@/assets/crowd.png';
 
 export const CrowdOverlay = () => {
   return (
-    <div 
+    <div
       className="absolute inset-x-0 pointer-events-none overflow-hidden"
-      style={{ 
-        top: '5%',
+      style={{
+        top: '32%',
         height: '35%',
-        zIndex: 10,
+        zIndex: 1,
+        scale: '2.8',
       }}
     >
       {/* Single crowd image that covers the grey stadium background area */}
       <div className="w-full h-full flex items-center justify-center">
-        <img 
-          src={crowdImage} 
-          alt="Stadium crowd" 
+        <img
+          src={crowdImage}
+          alt="Stadium crowd"
           className="w-full h-full object-contain object-center"
-          style={{ 
+          style={{
             filter: 'brightness(1.1) saturate(1.1)',
           }}
         />

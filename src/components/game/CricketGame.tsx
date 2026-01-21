@@ -28,34 +28,34 @@ export const CricketGame = () => {
   const [ballsRemaining, setBallsRemaining] = useState(6);
   const [currentRun, setCurrentRun] = useState<number | null>(null);
   const [lastShotType, setLastShotType] = useState<string | null>(null);
-  
+
   const [bowlingProgress, setBowlingProgress] = useState(0);
   const [isSwinging, setIsSwinging] = useState(false);
   const [swingProgress, setSwingProgress] = useState(0);
   const [hitResult, setHitResult] = useState<number | null>(null);
   const [isOut, setIsOut] = useState(false);
   const [canHit, setCanHit] = useState(false);
-  
+
   const hitTimingRef = useRef(0);
   const animationFrameRef = useRef<number>();
   const bowlingStartTimeRef = useRef(0);
   const gameStateRef = useRef<GameState>('idle');
   const hasSwungRef = useRef(false);
-  
+
   // Timing window constants - Easy mode with longer hit window
   const PERFECT_TIMING_START = 0.70; // Start glow earlier for easier timing
   const PERFECT_TIMING_END = 0.95;   // Extended timing window
   const BOWLING_DURATION = 3200;     // Slower bowling (was 2400ms)
-  
+
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
-  
+
   const calculateRuns = useCallback((timing: number): number => {
     // timing is normalized 0-1 within the hitting window
     // 0.5 = perfect timing (middle of the window)
     const normalizedTiming = Math.abs(timing - 0.5) * 2;
-    
+
     if (normalizedTiming < 0.1) return 6;  // Perfect timing
     if (normalizedTiming < 0.22) return 4;
     if (normalizedTiming < 0.38) return 3;
@@ -63,7 +63,7 @@ export const CricketGame = () => {
     if (normalizedTiming < 0.78) return 1;
     return 0;
   }, []);
-  
+
   const handleOut = useCallback(() => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -71,12 +71,12 @@ export const CricketGame = () => {
     setIsOut(true);
     setGameState('out');
     setCanHit(false);
-    
+
     setTimeout(() => {
       setPhase('out');
     }, 1200);
   }, []);
-  
+
   const startBowling = useCallback(() => {
     setGameState('bowling');
     setBowlingProgress(0);
@@ -84,33 +84,33 @@ export const CricketGame = () => {
     hitTimingRef.current = 0;
     hasSwungRef.current = false;
     bowlingStartTimeRef.current = performance.now();
-    
+
     const animate = () => {
       if (gameStateRef.current !== 'bowling') return;
-      
+
       const elapsed = performance.now() - bowlingStartTimeRef.current;
       const progress = Math.min(elapsed / BOWLING_DURATION, 1);
-      
+
       setBowlingProgress(progress);
-      
+
       if (progress >= PERFECT_TIMING_START && progress <= PERFECT_TIMING_END) {
         setCanHit(true);
         hitTimingRef.current = (progress - PERFECT_TIMING_START) / (PERFECT_TIMING_END - PERFECT_TIMING_START);
       } else {
         setCanHit(false);
       }
-      
+
       if (progress >= 1) {
         handleOut();
         return;
       }
-      
+
       animationFrameRef.current = requestAnimationFrame(animate);
     };
-    
+
     animationFrameRef.current = requestAnimationFrame(animate);
   }, [handleOut]);
-  
+
   const nextBall = useCallback(() => {
     setGameState('idle');
     setHitResult(null);
@@ -118,38 +118,38 @@ export const CricketGame = () => {
     setIsSwinging(false);
     setSwingProgress(0);
     hasSwungRef.current = false;
-    
+
     setTimeout(() => {
       startBowling();
     }, 900);
   }, [startBowling]);
-  
+
   const handleHit = useCallback(() => {
     if (gameStateRef.current !== 'bowling') return;
     if (hasSwungRef.current) return; // Prevent multiple swings per ball
-    
+
     hasSwungRef.current = true;
-    
+
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
     }
-    
+
     const timing = hitTimingRef.current;
     const runs = canHit ? calculateRuns(timing) : 0;
-    
+
     // Start swing animation immediately
     setIsSwinging(true);
     setGameState('hitting');
-    
+
     // Animate the swing
     let swingStart = performance.now();
     const SWING_DURATION = 300; // Longer swing for visibility
-    
+
     const animateSwing = () => {
       const elapsed = performance.now() - swingStart;
       const progress = Math.min(elapsed / SWING_DURATION, 1);
       setSwingProgress(progress);
-      
+
       if (progress < 1) {
         requestAnimationFrame(animateSwing);
       } else {
@@ -164,7 +164,7 @@ export const CricketGame = () => {
           setHitResult(runs);
           setCurrentRun(runs);
           setLastShotType(SHOT_TYPES[runs] || 'Miss');
-          
+
           // Hold swing position briefly then reset
           setTimeout(() => {
             setIsSwinging(false);
@@ -174,24 +174,24 @@ export const CricketGame = () => {
         }
       }
     };
-    
+
     requestAnimationFrame(animateSwing);
   }, [calculateRuns, handleOut, canHit]);
-  
-  const onBallReachBat = useCallback(() => {}, []);
-  
+
+  const onBallReachBat = useCallback(() => { }, []);
+
   const onAnimationComplete = useCallback(() => {
     const newBallsRemaining = ballsRemaining - 1;
     setBallsRemaining(newBallsRemaining);
-    
+
     if (hitResult !== null && hitResult > 0) {
       setScore(prev => prev + hitResult);
     }
-    
+
     setTimeout(() => {
       setCurrentRun(null);
       setLastShotType(null);
-      
+
       if (newBallsRemaining <= 0) {
         setPhase('gameover');
       } else {
@@ -199,7 +199,7 @@ export const CricketGame = () => {
       }
     }, 1000);
   }, [ballsRemaining, hitResult, nextBall]);
-  
+
   const startGame = useCallback(() => {
     setPhase('playing');
     setScore(0);
@@ -211,12 +211,12 @@ export const CricketGame = () => {
     setGameState('idle');
     setBowlingProgress(0);
     hasSwungRef.current = false;
-    
+
     setTimeout(() => {
       startBowling();
     }, 900);
   }, [startBowling]);
-  
+
   const resetGame = useCallback(() => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -235,7 +235,7 @@ export const CricketGame = () => {
     setCanHit(false);
     hasSwungRef.current = false;
   }, []);
-  
+
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
@@ -243,7 +243,7 @@ export const CricketGame = () => {
       }
     };
   }, []);
-  
+
   return (
     <div className="relative w-full h-[100dvh] overflow-hidden bg-background touch-none select-none">
       {/* Game canvas with proper mobile aspect ratio */}
@@ -259,42 +259,42 @@ export const CricketGame = () => {
           onAnimationComplete={onAnimationComplete}
         />
       </div>
-      
+
       {/* Crowd overlay - always visible, behind all UI screens */}
       <CrowdOverlay />
-      
+
       <AnimatePresence mode="wait">
         {phase === 'start' && (
           <StartScreen key="start" onStart={startGame} />
         )}
-        
+
         {phase === 'out' && (
-          <OutScreen 
-            key="out" 
-            score={score} 
+          <OutScreen
+            key="out"
+            score={score}
             ballsFaced={6 - ballsRemaining}
-            onRetry={resetGame} 
+            onRetry={resetGame}
           />
         )}
-        
+
         {phase === 'gameover' && (
-          <GameOverScreen 
-            key="gameover" 
-            score={score} 
-            onRetry={resetGame} 
+          <GameOverScreen
+            key="gameover"
+            score={score}
+            onRetry={resetGame}
           />
         )}
       </AnimatePresence>
-      
+
       {phase === 'playing' && (
         <>
-          <GameHUD 
-            score={score} 
+          <GameHUD
+            score={score}
             ballsRemaining={ballsRemaining}
             currentRun={currentRun}
             lastShotType={lastShotType}
           />
-          <HitButton 
+          <HitButton
             onHit={handleHit}
             disabled={gameState !== 'bowling'}
             canHit={canHit}
