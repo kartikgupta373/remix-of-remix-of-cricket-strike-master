@@ -246,8 +246,11 @@ export const CricketGame = () => {
 
   return (
     <div className="relative w-full h-[100dvh] overflow-hidden bg-background touch-none select-none">
-      {/* Game canvas with proper mobile aspect ratio */}
-      <div className="absolute inset-0">
+      {/* Crowd overlay - background layer behind 3D scene */}
+      <CrowdOverlay />
+      
+      {/* Game canvas with proper mobile aspect ratio - renders in front of crowd */}
+      <div className="absolute inset-0" style={{ zIndex: 15 }}>
         <GameScene
           gameState={gameState}
           bowlingProgress={bowlingProgress}
@@ -259,9 +262,6 @@ export const CricketGame = () => {
           onAnimationComplete={onAnimationComplete}
         />
       </div>
-
-      {/* Crowd overlay - always visible, behind all UI screens */}
-      <CrowdOverlay />
 
       <AnimatePresence mode="wait">
         {phase === 'start' && (
